@@ -47,7 +47,7 @@ export async function ready() {
 			response.body = response.body.string;
 			return response;
 		} else return next_handler(request);
-	});
+	}, apollo_options);
 }
 function streamToBuffer(stream) {
 	return new Promise((resolve, reject) => {
