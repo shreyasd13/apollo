@@ -1,15 +1,49 @@
 import {
 	ApolloServer
 } from '@apollo/server';
+
 import { parse } from 'node:url';
 import {isMainThread} from 'node:worker_threads';
 import { pathToFileURL } from 'url';
 
+const {GraphQL} = databases.cache;
+
 let graphql_schema = `
-directive @table on OBJECT
-directive @export on OBJECT
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+directive @cacheControl(
+  maxAge: Int
+  scope: CacheControlScope
+  inheritMaxAge: Boolean
+) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+directive @table(
+	database: String 
+	table: String
+	expiration: Int
+	audit: Boolean
+) on OBJECT
+
+directive @export(
+	name: String
+) on OBJECT
+
+directive @sealed on OBJECT
 directive @primaryKey on FIELD_DEFINITION
 directive @indexed on FIELD_DEFINITION
+directive @updatedTime on FIELD_DEFINITION
+directive @relationship(
+	to: String
+	from: String
+) on FIELD_DEFINITION
+
+scalar Long
+scalar BigInt
+scalar Date
+scalar Any
 `;
 let resolvers = {};
 let apollo_options;
@@ -32,6 +66,7 @@ export async function ready() {
 	apollo = new ApolloServer({
 		typeDefs: graphql_schema,
 		resolvers,
+		cache: new HarperDBCache()
 	})
 	await apollo.start();
 	server.http(async (request, next_handler) => {
@@ -56,4 +91,29 @@ function streamToBuffer(stream) {
 		stream.on('end', () => resolve(Buffer.concat(buffers)));
 		stream.on('error', reject);
 	});
+}
+
+class HarperDBCache extends Resource {
+
+	async get(key){
+			let data = await GraphQL.get(key);
+			return data?.get('query');
+	}
+
+	async set(key, value, options){
+		let context = this.getContext();
+		if(options?.ttl) {
+			if(!context) {
+				context = {};
+			}
+			//the ttl is in seconds
+			context.expiresAt = Date.now() + (options.ttl * 1000);
+		}
+
+		await GraphQL.put({ id: key, query: value }, context);
+	}
+
+	async delete(key){
+		await GraphQL.delete(key);
+	}
 }

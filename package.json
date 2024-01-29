@@ -4,6 +4,6 @@
   "description": "A template for building HarperDB applications",
   "type": "module",
   "dependencies": {
-    "@apollo/server": "^4.9.5"
-  }
+    "@apollo/server": "^4.10.0"
+ }
 }
