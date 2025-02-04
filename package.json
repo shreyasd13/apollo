@@ -1,9 +1,9 @@
 {
-  "name": "harperdb-apollo",
-  "version": "1.0.0",
-  "description": "A template for building HarperDB applications",
+  "name": "@harperdb/apollo",
+  "version": "0.0.1",
+  "description": "A HarperDB Component for running Apollo apps.",
   "type": "module",
   "dependencies": {
     "@apollo/server": "^4.10.0"
- }
+  }
 }
