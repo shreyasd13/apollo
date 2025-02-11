@@ -4,6 +4,7 @@
   "description": "A HarperDB Component for running Apollo apps.",
   "type": "module",
   "dependencies": {
-    "@apollo/server": "^4.10.0"
+    "@apollo/server": "^4.10.0",
+    "fast-glob": "^3.3.3"
   }
 }
