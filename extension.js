@@ -74,9 +74,10 @@ export function start(options = {}) {
 
 			// Load the schemas
 			const schemasPath = join(componentPath, config.schemas)
+			console.log("componentPath : ", componentPath);
 			console.log("schemasPath : ", schemasPath);
 			let typeDefs = BASE_SCHEMA;
-			for (const filePath of fastGlob.sync(fastGlob.convertPathToPattern(schemasPath), { onlyFiles: true })) {
+			for (const filePath of fastGlob.globSync(schemasPath, { onlyFiles: true })) {
 				console.log("filePath : ", filePath);
 				typeDefs += readFileSync(filePath, 'utf-8');
 			}
