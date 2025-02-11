@@ -65,12 +65,19 @@ export function start(options = {}) {
 
 			// Load the resolvers
 			const resolversPath = join(componentPath, config.resolvers);
+			console.log("Resolver path : ");
+			console.log(config.resolvers);
+			
 			const resolvers = await import(pathToFileURL(resolversPath));
+			console.log("RESOLVERS : ");
+			console.log(resolvers);
 
 			// Load the schemas
 			const schemasPath = join(componentPath, config.schemas)
+			console.log("schemasPath : ", schemasPath);
 			let typeDefs = BASE_SCHEMA;
 			for (const filePath of fastGlob.sync(fastGlob.convertPathToPattern(schemasPath), { onlyFiles: true })) {
+				console.log("filePath : ", filePath);
 				typeDefs += readFileSync(filePath, 'utf-8');
 			}
 
